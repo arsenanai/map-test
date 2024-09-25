@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenMapTiles Map Example</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Deafult.css" />
+    <style>
+        #map {
+            height: 100vh;
+        }
+    </style>
+</head>
+<body>
+<div id="map"></div>
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+<script>
+    let map = L.map('map').setView([51.505, -0.09], 13);
+    document.addEventListener('DOMContentLoaded', function() {
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+    });
+
+    function generateRandomPoint(index) {
+        const longitude = Math.random() * 360 - 180;
+        const latitude = Math.random() * 180 - 90;
+        return {
+            type: 'Point',
+            title: `Point ${index}`,
+            coordinates: [longitude, latitude]
+        };
+    }
+
+
+    function generateRandomGeoJSONPoints(count) {
+        const points = [];
+        for (let i = 0; i < count; i++) {
+            points.push(generateRandomPoint(i+1));
+        }
+        return points;
+    }
+
+    const randomGeoJSONPoints = generateRandomGeoJSONPoints(100000);
+
+    //console.log(randomGeoJSONPoints);
+    
+    map._layersMaxZoom = 19;
+    let markers = L.markerClusterGroup();
+    for( point of randomGeoJSONPoints) {
+        const latLng = L.latLng(point.coordinates[0], point.coordinates[1]);
+        markers.addLayer(L.marker(latLng, {title:point.title}));
+    }
+    map.addLayer(markers);
+</script>
+</body>
+</html>
